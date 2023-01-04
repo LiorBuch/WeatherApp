@@ -48,7 +48,7 @@ class MainScreen(Screen):
                 url=f"https://weathergrab.azurewebsites.net/api/geocoding?city={self.search_box.text}")
             if weather_pack.status_code == 200:
                 data = weather_pack.json()
-                self.sky_icon.source = f'http://openweathermap.org/img/wn/{data}@2x.png' # Todo add data nest
+                self.sky_icon.source = f'http://openweathermap.org/img/wn/{data}@2x.png'  # Todo add data nest
                 self.temp.text = data  # Todo add data nest
                 self.min_temp.text = data  # Todo add data nest
                 self.max_temp.text = data  # Todo add data nest
@@ -57,6 +57,6 @@ class MainScreen(Screen):
                 print(data)
             else:
                 pop = Popup(title="Connection Error")
-                pop.open()
+                pop.open(size_hint=(0.4, 0.4))
         except:
             print("error")
