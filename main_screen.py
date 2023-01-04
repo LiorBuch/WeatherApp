@@ -55,5 +55,8 @@ class MainScreen(Screen):
                 self.description.text = data  # Todo add data nest
                 data = weather_pack.json()
                 print(data)
+            else:
+                pop = Popup(title="Connection Error")
+                pop.open()
         except:
             print("error")
