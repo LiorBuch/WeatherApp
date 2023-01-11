@@ -63,5 +63,5 @@ class MainScreen(Screen):
             else:
                 pop = Popup(title="Connection Error")
                 pop.open(size_hint=(0.4, 0.4))
-        except:
-            print("error")
+        except Exception as e:
+            print(f"error , error log is:{e}")
