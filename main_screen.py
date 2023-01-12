@@ -50,7 +50,7 @@ class MainScreen(Screen):
         try:
             city_name = self.search_box.text
             weather_pack = requests.get(
-                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}")
+                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}",timeout=10)
             if weather_pack.status_code == 200:
                 data = weather_pack.json()
                 self.sky_icon.source = f'http://openweathermap.org/img/wn/{str(data["state"]["sky_icon"])}@2x.png'
