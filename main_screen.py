@@ -21,6 +21,10 @@ class MainScreen(Screen):
                                       pos_hint={'top': 0.95, 'left': 0.1})
         self.search_btn = MDFlatButton(text="Search Weather", on_press=self.search_btn_click,
                                        pos_hint={'right': 0.95, 'bottom': 0.95})
+        self.test_btn = MDFlatButton(text="test offline", on_press=self.test_click,
+                                     pos_hint={'right': 0.80, 'bottom': 0.95})
+        self.test_request_btn = MDFlatButton(text="test request", on_press=self.test_request_click,
+                                             pos_hint={'right': 0.65, 'bottom': 0.95})
         self.city_name = MDLabel(text="")
         self.temp = MDLabel(text="0")
         self.sky_status = MDLabel(text="sky state")
@@ -38,7 +42,22 @@ class MainScreen(Screen):
         self.main_layout.add_widget(self.sky_icon)
         self.main_layout.add_widget(self.search_box)
         self.main_layout.add_widget(self.search_btn)
+        self.main_layout.add_widget(self.test_btn)
+        self.main_layout.add_widget(self.test_request_btn)
         self.add_widget(self.main_layout)
+
+    def test_click(self, instance):
+        self.city_name.text = "offline working!"
+
+    def test_request_click(self, instance):
+        try:
+            res = requests.get(url="https://www.youtube.com/")
+            if res.status_code == 200:
+                self.city_name.text = "request working!"
+            else:
+                self.city_name.text = "request connection error"
+        except Exception as e:
+            print(f"request gone bad! :( here is the error: {e}")
 
     def search_btn_click(self, instance):
         if self.search_box.text == "" or self.search_box.text is None:
@@ -50,7 +69,7 @@ class MainScreen(Screen):
         try:
             city_name = self.search_box.text
             weather_pack = requests.get(
-                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}/",timeout=10)
+                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}/", timeout=10)
             if weather_pack.status_code == 200:
                 data = weather_pack.json()
                 self.sky_icon.source = f'http://openweathermap.org/img/wn/{str(data["state"]["sky_icon"])}@2x.png'
@@ -64,4 +83,6 @@ class MainScreen(Screen):
                 pop = Popup(title="Connection Error")
                 pop.open(size_hint=(0.4, 0.4))
         except Exception as e:
+            pop = Popup(title="Connection Error")
+            pop.open(size_hint=(0.4, 0.4))
             print(f"error , error log is:{e}")
