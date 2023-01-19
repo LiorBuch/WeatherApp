@@ -37,7 +37,7 @@ version = 0.1.01
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3==3.9.16,certifi==2022.12.7,charset-normalizer==2.1.1,docutils==0.19,idna==3.4,Kivy==2.1.0,Kivy-Garden==0.1.5,kivymd==1.1.1,Pygments==2.14.0,requests==2.28.1,urllib3==1.26.13,
+requirements = python3==3.9.16,certifi==2022.12.7,charset-normalizer==2.1.1,docutils==0.19,idna==3.4,Kivy==2.1.0,Kivy-Garden==0.1.5,kivymd==1.1.1,Pygments==2.14.0,requests==2.28.1,urllib3==1.26.13,plyer==2.1.0,
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -93,7 +93,7 @@ fullscreen = 1
 #icon.adaptive_background.filename = %(source.dir)s/data/icon_bg.png
 
 # (list) Permissions
-android.permissions = INTERNET
+android.permissions = INTERNET,ACCESS_FINE_LOCATION,ACCESS_COARSE_LOCATION
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host

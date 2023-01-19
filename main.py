@@ -1,3 +1,4 @@
+from kivy.core.window import Window
 from kivy.uix.screenmanager import ScreenManager
 from kivymd.app import MDApp
 
@@ -11,6 +12,7 @@ class MainApp(MDApp):
         self.main_screen = None
 
     def build(self):
+        Window.size = (540,920)
         self.sm = ScreenManager()
         self.main_screen = main_screen.MainScreen()
         self.sm.add_widget(self.main_screen)

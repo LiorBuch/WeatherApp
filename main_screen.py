@@ -1,6 +1,5 @@
 import json
-
-import requests
+from plyer import gps
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -24,6 +23,7 @@ class MainScreen(Screen):
                                       pos_hint={'top': 0.95, 'left': 0.1})
         self.search_btn = MDFlatButton(text="Search Weather", on_press=self.search_btn_click,
                                        pos_hint={'right': 0.95, 'bottom': 0.95})
+        self.search_by_loc_btn = MDFlatButton(text="Search By GPS", pos_hint={'left': 0.95, 'bottom': 0.95},on_press=self.location_btn)
         self.city_name = MDLabel(text="")
         self.temp = MDLabel(text="0")
         self.sky_status = MDLabel(text="sky state")
@@ -41,6 +41,7 @@ class MainScreen(Screen):
         self.main_layout.add_widget(self.sky_icon)
         self.main_layout.add_widget(self.search_box)
         self.main_layout.add_widget(self.search_btn)
+        self.main_layout.add_widget(self.search_by_loc_btn)
         self.add_widget(self.main_layout)
 
     def search_btn_click(self, instance):
@@ -71,3 +72,16 @@ class MainScreen(Screen):
         self.city_name.text = str(data['city_name'])
         self.sky_status.text = str(data['state']['sky'])
         self.description.text = str(data['state']['sky_info'])
+
+    def location_btn(self, instance):
+        def send_loc(**kwargs):
+            print("go!")
+            lat = kwargs["lat"]
+            lon = kwargs["lon"]
+            self.city_name.text = lat
+            print(lat)
+            print(lon)
+
+        gps.configure(on_location=send_loc)
+        gps.start()
+        gps.stop()
