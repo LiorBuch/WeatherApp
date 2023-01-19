@@ -1,4 +1,7 @@
+import json
+
 import requests
+from kivy.network.urlrequest import UrlRequest
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import AsyncImage
@@ -21,10 +24,6 @@ class MainScreen(Screen):
                                       pos_hint={'top': 0.95, 'left': 0.1})
         self.search_btn = MDFlatButton(text="Search Weather", on_press=self.search_btn_click,
                                        pos_hint={'right': 0.95, 'bottom': 0.95})
-        self.test_btn = MDFlatButton(text="test offline", on_press=self.test_click,
-                                     pos_hint={'right': 0.80, 'bottom': 0.95})
-        self.test_request_btn = MDFlatButton(text="test request", on_press=self.test_request_click,
-                                             pos_hint={'right': 0.65, 'bottom': 0.95})
         self.city_name = MDLabel(text="")
         self.temp = MDLabel(text="0")
         self.sky_status = MDLabel(text="sky state")
@@ -42,47 +41,33 @@ class MainScreen(Screen):
         self.main_layout.add_widget(self.sky_icon)
         self.main_layout.add_widget(self.search_box)
         self.main_layout.add_widget(self.search_btn)
-        self.main_layout.add_widget(self.test_btn)
-        self.main_layout.add_widget(self.test_request_btn)
         self.add_widget(self.main_layout)
 
-    def test_click(self, instance):
-        self.city_name.text = "offline working!"
-
-    def test_request_click(self, instance):
-        try:
-            res = requests.get(url="https://www.youtube.com/")
-            if res.status_code == 200:
-                self.city_name.text = "request working!"
-            else:
-                self.city_name.text = "request connection error"
-        except Exception as e:
-            print(f"request gone bad! :( here is the error: {e}")
-
     def search_btn_click(self, instance):
-        if self.search_box.text == "" or self.search_box.text is None:
+        if not self.search_box.text.isalpha() or self.search_box.text is None:
             pop = Popup(size_hint=(0.4, 0.4))
-            pop.title = "City name cant be blank!"
+            pop.title = "Incorrect Format!"
             self.search_box.error = True
             pop.open()
             return
         try:
             city_name = self.search_box.text
-            weather_pack = requests.get(
-                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}/", timeout=10)
-            if weather_pack.status_code == 200:
-                data = weather_pack.json()
-                self.sky_icon.source = f'http://openweathermap.org/img/wn/{str(data["state"]["sky_icon"])}@2x.png'
-                self.temp.text = "Current Temperature:" + str(data['temp']['current'])
-                self.min_temp.text = "Minimum Temperature Today:" + str(data['temp']['min'])
-                self.max_temp.text = "Maximum Temperature Today:" + str(data['temp']['max'])
-                self.city_name.text = str(data['city_name'])
-                self.sky_status.text = str(data['state']['sky'])
-                self.description.text = str(data['state']['sky_info'])
-            else:
-                pop = Popup(title="Connection Error")
-                pop.open(size_hint=(0.4, 0.4))
+            weather_pack = UrlRequest(
+                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}/", timeout=10,
+                on_success=self.prini)
+            weather_pack.wait()
+
         except Exception as e:
-            pop = Popup(title="Connection Error")
-            pop.open(size_hint=(0.4, 0.4))
+            pop = Popup(title="Connection Error", size_hint=(0.4, 0.4))
+            pop.open()
             print(f"error , error log is:{e}")
+
+    def prini(self, *args):
+        data = json.loads(args[1])
+        self.sky_icon.source = f'http://openweathermap.org/img/wn/{str(data["state"]["sky_icon"])}@2x.png'
+        self.temp.text = "Current Temperature:" + str(data['temp']['current'])
+        self.min_temp.text = "Minimum Temperature Today:" + str(data['temp']['min'])
+        self.max_temp.text = "Maximum Temperature Today:" + str(data['temp']['max'])
+        self.city_name.text = str(data['city_name'])
+        self.sky_status.text = str(data['state']['sky'])
+        self.description.text = str(data['state']['sky_info'])
