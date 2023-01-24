@@ -1,4 +1,7 @@
 import json
+
+from kivy.core.window import Window
+from kivy.graphics import Color, Rectangle
 from plyer import gps
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.boxlayout import BoxLayout
@@ -17,8 +20,8 @@ class MainScreen(Screen):
         super().__init__(**kw)
         self.name = "main_screen"
         self.main_layout = FloatLayout()
-        self.stats_layout = BoxLayout(size_hint=(0.5, 0.2), orientation="vertical", pos_hint={'top': 0.7},spacing = 10)
-        self.sky_icon = AsyncImage(size_hint=(0.2, 0.2), pos_hint={'center_x': 0.7, 'center_y': 0.7})
+        self.stats_layout = BoxLayout(size_hint=(0.7, 0.2), orientation="vertical", pos_hint={'top': 0.7},spacing = 10)
+        self.sky_icon = AsyncImage(size_hint=(0.3, 0.3), pos_hint={'center_x': 0.7, 'center_y': 0.7})
         self.search_box_city = MDTextField(hint_text="Enter City Name", size_hint=(0.3, 1),
                                            pos_hint={'top': 0.95, 'left': 0.1})
         self.search_box_country = MDTextField(hint_text="Enter Country Name", size_hint=(0.3, 1),
@@ -34,19 +37,25 @@ class MainScreen(Screen):
         self.min_temp = MDLabel(text="0")
         self.max_temp = MDLabel(text="0")
 
+        self.sky_icon.opacity=0
+
         self.main_layout.add_widget(self.stats_layout)
+        self.main_layout.add_widget(self.sky_icon)
         self.stats_layout.add_widget(self.city_name)
         self.stats_layout.add_widget(self.sky_status)
         self.stats_layout.add_widget(self.description)
         self.stats_layout.add_widget(self.temp)
         self.stats_layout.add_widget(self.max_temp)
         self.stats_layout.add_widget(self.min_temp)
-        self.main_layout.add_widget(self.sky_icon)
         self.main_layout.add_widget(self.search_box_city)
         self.main_layout.add_widget(self.search_box_country)
         self.main_layout.add_widget(self.search_btn)
         self.main_layout.add_widget(self.search_by_loc_btn)
         self.add_widget(self.main_layout)
+
+        with self.canvas.before:
+            Color(0.5,0.5,0.5,0.5)
+            self.rect = Rectangle(size=Window.size)
 
     def search_btn_click(self, instance):
         if not self.search_box_city.text.isalpha() or self.search_box_city.text is None:
@@ -69,6 +78,7 @@ class MainScreen(Screen):
             print(f"error , error log is:{e}")
 
     def prini(self, *args):
+        self.sky_icon.opacity=1
         data = json.loads(args[1])
         self.sky_icon.source = f'http://openweathermap.org/img/wn/{str(data["state"]["sky_icon"])}@2x.png'
         self.temp.text = "Current Temperature:" + str(data['temp']['current'])
