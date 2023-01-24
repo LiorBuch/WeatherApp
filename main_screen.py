@@ -54,7 +54,7 @@ class MainScreen(Screen):
         try:
             city_name = self.search_box.text
             weather_pack = UrlRequest(
-                url=f"https://gittester.azurewebsites.net/weather/city={city_name}&key={self.api_key}/", timeout=10,
+                url=f"https://gittester.azurewebsites.net/weather/city={city_name}/",req_headers={'api':self.api_key} ,timeout=10,
                 on_success=self.prini)
             weather_pack.wait()
 
