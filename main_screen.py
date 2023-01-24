@@ -50,7 +50,7 @@ class MainScreen(Screen):
 
     def search_btn_click(self, instance):
         if not self.search_box_city.text.isalpha() or self.search_box_city.text is None:
-            pop = Popup(size_hint=(0.4, 0.4))
+            pop = Popup(size_hint=(0.4, 0.2))
             pop.title = "Incorrect Format!"
             self.search_box_city.error = True
             pop.open()
@@ -64,7 +64,7 @@ class MainScreen(Screen):
             weather_pack.wait()
 
         except Exception as e:
-            pop = Popup(title="internal error", size_hint=(0.4, 0.4))
+            pop = Popup(title="internal error", size_hint=(0.4, 0.2))
             pop.open()
             print(f"error , error log is:{e}")
 
@@ -80,17 +80,17 @@ class MainScreen(Screen):
 
     def location_btn(self, instance):
         print("starting gps")
-        def send_loc(**kwargs):
-            print("go!")
-            lat = kwargs["lat"]
-            lon = kwargs["lon"]
-            self.city_name.text = lat
-            print(lat)
-            print(lon)
-
-        gps.configure(on_location=send_loc)
+        gps.configure(on_location=self.send_loc)
         gps.start()
         gps.stop()
+
+    def send_loc(self,**kwargs):
+        print("go!")
+        lat = kwargs["lat"]
+        lon = kwargs["lon"]
+        self.city_name.text = lat
+        print(lat)
+        print(lon)
 
     def multi_country(self, *args):
         pop = Popup(title="Problem with request")
