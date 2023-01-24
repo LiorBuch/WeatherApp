@@ -17,13 +17,16 @@ class MainScreen(Screen):
         super().__init__(**kw)
         self.name = "main_screen"
         self.main_layout = FloatLayout()
-        self.stats_layout = BoxLayout(size_hint=(0.5, 0.2), orientation="vertical", pos_hint={'top': 0.7})
+        self.stats_layout = BoxLayout(size_hint=(0.5, 0.2), orientation="vertical", pos_hint={'top': 0.7},spacing = 10)
         self.sky_icon = AsyncImage(size_hint=(0.2, 0.2), pos_hint={'center_x': 0.7, 'center_y': 0.7})
-        self.search_box = MDTextField(hint_text="Enter City Name", size_hint=(0.3, 1),
-                                      pos_hint={'top': 0.95, 'left': 0.1})
+        self.search_box_city = MDTextField(hint_text="Enter City Name", size_hint=(0.3, 1),
+                                           pos_hint={'top': 0.95, 'left': 0.1})
+        self.search_box_country = MDTextField(hint_text="Enter Country Name", size_hint=(0.3, 1),
+                                              pos_hint={'top': 0.90, 'left': 0.1})
         self.search_btn = MDFlatButton(text="Search Weather", on_press=self.search_btn_click,
                                        pos_hint={'right': 0.95, 'bottom': 0.95})
-        self.search_by_loc_btn = MDFlatButton(text="Search By GPS", pos_hint={'left': 0.95, 'bottom': 0.95},on_press=self.location_btn)
+        self.search_by_loc_btn = MDFlatButton(text="Search By GPS", pos_hint={'left': 0.95, 'bottom': 0.95},
+                                              on_press=self.location_btn)
         self.city_name = MDLabel(text="")
         self.temp = MDLabel(text="0")
         self.sky_status = MDLabel(text="sky state")
@@ -39,27 +42,29 @@ class MainScreen(Screen):
         self.stats_layout.add_widget(self.max_temp)
         self.stats_layout.add_widget(self.min_temp)
         self.main_layout.add_widget(self.sky_icon)
-        self.main_layout.add_widget(self.search_box)
+        self.main_layout.add_widget(self.search_box_city)
+        self.main_layout.add_widget(self.search_box_country)
         self.main_layout.add_widget(self.search_btn)
         self.main_layout.add_widget(self.search_by_loc_btn)
         self.add_widget(self.main_layout)
 
     def search_btn_click(self, instance):
-        if not self.search_box.text.isalpha() or self.search_box.text is None:
+        if not self.search_box_city.text.isalpha() or self.search_box_city.text is None:
             pop = Popup(size_hint=(0.4, 0.4))
             pop.title = "Incorrect Format!"
-            self.search_box.error = True
+            self.search_box_city.error = True
             pop.open()
             return
         try:
-            city_name = self.search_box.text
+            city_name = self.search_box_city.text
             weather_pack = UrlRequest(
-                url=f"https://gittester.azurewebsites.net/weather/city={city_name}/",req_headers={'api':self.api_key} ,timeout=10,
-                on_success=self.prini)
+                url=f"https://gittester.azurewebsites.net/weather/city={city_name}/", req_headers={'api': self.api_key},
+                timeout=10,
+                on_success=self.prini, on_redirect=self.multi_country)
             weather_pack.wait()
 
         except Exception as e:
-            pop = Popup(title="Connection Error", size_hint=(0.4, 0.4))
+            pop = Popup(title="internal error", size_hint=(0.4, 0.4))
             pop.open()
             print(f"error , error log is:{e}")
 
@@ -74,6 +79,7 @@ class MainScreen(Screen):
         self.description.text = str(data['state']['sky_info'])
 
     def location_btn(self, instance):
+        print("starting gps")
         def send_loc(**kwargs):
             print("go!")
             lat = kwargs["lat"]
@@ -85,3 +91,9 @@ class MainScreen(Screen):
         gps.configure(on_location=send_loc)
         gps.start()
         gps.stop()
+
+    def multi_country(self, *args):
+        pop = Popup(title="Problem with request")
+        pop_label = MDLabel(text=json.loads(args[1])["info"])
+        pop.content = pop_label
+        pop.open()
